@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* Smart Reading Shelf Design System */
+@layer base {
+  :root {
+    /* Core Brand Colors - HSL from hex */
+    --navy: 209 31% 26%;           /* #2f4156 */
+    --teal: 199 24% 44%;           /* #567c8d */
+    --beige: 30 33% 94%;           /* #f5efeb */
+    --sky-blue: 201 32% 84%;       /* #c8d9e6 */
+    --white: 0 0% 100%;            /* #ffffff */
+    
+    /* Semantic Tokens */
+    --background: var(--beige);
+    --foreground: var(--navy);
+    
+    --card: var(--white);
+    --card-foreground: var(--navy);
+    
+    --popover: var(--white);
+    --popover-foreground: var(--navy);
+    
+    --primary: var(--teal);
+    --primary-foreground: var(--white);
+    
+    --secondary: var(--sky-blue);
+    --secondary-foreground: var(--navy);
+    
+    --muted: var(--beige);
+    --muted-foreground: 209 20% 45%;
+    
+    --accent: var(--sky-blue);
+    --accent-foreground: var(--navy);
+    
+    --destructive: 0 72% 51%;
+    --destructive-foreground: var(--white);
+    
+    --border: var(--sky-blue);
+    --input: var(--sky-blue);
+    --ring: var(--teal);
+    
+    --radius: 0.75rem;
+    
+    /* Typography */
+    --font-heading: 'Crimson Text', Georgia, serif;
+    --font-body: 'Work Sans', system-ui, sans-serif;
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(var(--navy) / 0.1);
+    --shadow-card: 0 2px 12px -2px hsl(var(--navy) / 0.08);
+    --shadow-elevated: 0 8px 30px -8px hsl(var(--navy) / 0.15);
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: var(--navy);
+    --sidebar-foreground: var(--beige);
+    --sidebar-primary: var(--teal);
+    --sidebar-primary-foreground: var(--white);
+    --sidebar-accent: 209 31% 20%;
+    --sidebar-accent-foreground: var(--beige);
+    --sidebar-border: 209 31% 22%;
+    --sidebar-ring: var(--teal);
+  }
+
+  .dark {
+    --background: var(--navy);
+    --foreground: var(--beige);
+    
+    --card: 209 31% 20%;
+    --card-foreground: var(--beige);
+    
+    --popover: 209 31% 18%;
+    --popover-foreground: var(--beige);
+    
+    --primary: var(--teal);
+    --primary-foreground: var(--white);
+    
+    --secondary: 209 31% 22%;
+    --secondary-foreground: var(--beige);
+    
+    --muted: 209 31% 22%;
+    --muted-foreground: 209 20% 65%;
+    
+    --accent: 209 31% 25%;
+    --accent-foreground: var(--beige);
+    
+    --border: 209 31% 25%;
+    --input: 209 31% 25%;
+    --ring: var(--teal);
+  }
+}
+
+/* Custom Cursor */
+@layer base {
+  * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000000' d='M5.5 3.21V20.8l5.71-5.71h8.29L5.5 3.21z'/%3E%3C/svg%3E") 0 0, auto;
+  }
+  
+  a, button, [role="button"], input[type="submit"], input[type="button"] {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000000' d='M5.5 3.21V20.8l5.71-5.71h8.29L5.5 3.21z'/%3E%3C/svg%3E") 0 0, pointer;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn var(--transition-smooth) ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp var(--transition-smooth) ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn var(--transition-fast) ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
