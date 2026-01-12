@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Index = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -8,7 +8,9 @@ const Index = () => {
 
   useEffect(() => {
     if (!isLoading) {
-      navigate(isAuthenticated ? '/dashboard' : '/login', { replace: true });
+      navigate(isAuthenticated ? "/dashboard" : "/login", {
+        replace: true,
+      });
     }
   }, [isAuthenticated, isLoading, navigate]);
 

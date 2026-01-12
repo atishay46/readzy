@@ -1,7 +1,19 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+  useEffect,
+} from "react";
 
+import { login as loginApi, signup as signupApi } from "../api/auth";
+
+// --------------------
+// Types
+// --------------------
 interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
 }
@@ -15,20 +27,29 @@ interface AuthContextType {
   logout: () => void;
 }
 
+// --------------------
+// Context
+// --------------------
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'smart_shelf_token';
-const USER_KEY = 'smart_shelf_user';
+// 🔑 MUST match apiFetch
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
+// --------------------
+// Provider
+// --------------------
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing session on mount
+  /**
+   * Restore session on refresh
+   */
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
     const storedUser = localStorage.getItem(USER_KEY);
-    
+
     if (token && storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -37,75 +58,70 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem(USER_KEY);
       }
     }
+
     setIsLoading(false);
   }, []);
 
   /**
-   * Login user with email and password
-   * TODO (Backend): Replace with POST /auth/login
-   * Save real JWT from backend response
+   * Login user (REAL BACKEND)
    */
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const res = await loginApi({ email, password });
 
-    // TEMP ONLY (REMOVE AFTER BACKEND):
-    // Simulating successful login for demo
-    if (email && password) {
-      const dummyUser: User = {
-        id: 'user_1',
-        name: email.split('@')[0],
-        email,
-      };
-      const dummyToken = 'dummy_jwt_token_' + Date.now();
+      // 1. Save token
+      localStorage.setItem(TOKEN_KEY, res.token);
 
-      localStorage.setItem(TOKEN_KEY, dummyToken);
-      localStorage.setItem(USER_KEY, JSON.stringify(dummyUser));
-      setUser(dummyUser);
+      // 2. Fetch logged-in user
+      const userRes = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${res.token}`,
+          },
+        }
+      );
 
-      // TODO (Backend):
-      // const response = await api.post('/auth/login', { email, password });
-      // localStorage.setItem(TOKEN_KEY, response.data.token);
-      // setUser(response.data.user);
+      if (!userRes.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const user: User = await userRes.json();
+
+      // 3. Save user
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      setUser(user);
 
       return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-
-    return false;
   }, []);
 
   /**
-   * Register new user
-   * TODO (Backend): POST /auth/signup
-   * Password hashing handled server-side
+   * Signup user (REAL BACKEND)
    */
-  const signup = useCallback(async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // TEMP ONLY (REMOVE AFTER BACKEND):
-    // Simulating successful signup for demo
-    if (name && email && password) {
-      // TODO (Backend):
-      // const response = await api.post('/auth/signup', { name, email, password });
-      // Return success and redirect to login
-      return true;
-    }
-
-    return false;
-  }, []);
+  const signup = useCallback(
+    async (name: string, email: string, password: string) => {
+      try {
+        await signupApi({ name, email, password });
+        return true;
+      } catch (error) {
+        console.error("Signup failed:", error);
+        return false;
+      }
+    },
+    []
+  );
 
   /**
-   * Logout current user
-   * TODO (Backend): POST /auth/logout (if using refresh tokens)
+   * Logout user
    */
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     setUser(null);
-
-    // TODO (Backend):
-    // await api.post('/auth/logout'); // If invalidating tokens server-side
   }, []);
 
   return (
@@ -124,10 +140,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
+// --------------------
+// Hook
+// --------------------
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

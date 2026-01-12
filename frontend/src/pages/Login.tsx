@@ -1,34 +1,51 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Mail, Lock, Loader2 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import React, { useEffect ,useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { BookOpen, Mail, Lock, Loader2 ,Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { useToast } from "../hooks/use-toast";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+
+
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
 
-  // Get redirect path from location state
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+  const from =
+    (location.state as { from?: { pathname: string } })?.from?.pathname ||
+    "/dashboard";
+
+  // ✅ REDIRECT WHEN AUTH STATE UPDATES
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, from, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast({
-        title: 'Missing fields',
-        description: 'Please fill in all fields.',
-        variant: 'destructive',
+        title: "Missing fields",
+        description: "Please fill in all fields.",
+        variant: "destructive",
       });
       return;
     }
@@ -36,26 +53,17 @@ const Login: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const success = await login(email, password);
-      
-      if (success) {
-        toast({
-          title: 'Welcome back!',
-          description: 'You have successfully logged in.',
-        });
-        navigate(from, { replace: true });
-      } else {
-        toast({
-          title: 'Login failed',
-          description: 'Please check your credentials and try again.',
-          variant: 'destructive',
-        });
-      }
+      await login(email, password);
+
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
     } catch {
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred. Please try again.',
-        variant: 'destructive',
+        title: "Login failed",
+        description: "Invalid email or password.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -65,64 +73,72 @@ const Login: React.FC = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-navy p-4">
       <div className="w-full max-w-md animate-slide-up">
-        {/* Logo */}
         <div className="mb-8 flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal shadow-elevated">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal">
             <BookOpen className="h-8 w-8 text-beige" />
           </div>
-          <h1 className="font-heading text-3xl font-bold text-beige">Smart Shelf</h1>
+          <h1 className="text-3xl font-bold text-beige">Readzy</h1>
           <p className="mt-2 text-sky-blue">Your personal reading companion</p>
         </div>
 
-        <Card className="border-sky-blue/20 bg-card shadow-elevated">
+        <Card className="border-sky-blue/20 bg-card">
           <CardHeader className="text-center">
-            <CardTitle className="font-heading text-2xl">Welcome Back</CardTitle>
-            <CardDescription>Sign in to continue to your library</CardDescription>
+            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <CardDescription>
+              Sign in to continue to your library
+            </CardDescription>
           </CardHeader>
-          
-          <form onSubmit={handleSubmit}>
+
+          <form onSubmit={handleSubmit} autoComplete="off">
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">
-                  Email
-                </Label>
+              <div>
+                <Label>Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
-                    id="email"
                     type="email"
-                    placeholder="you@example.com"
+                    autoComplete="new-email"
+                    placeholder="Enter your Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 border-sky-blue/50 focus:border-teal"
-                    disabled={isSubmitting}
+                    className="pl-10"
                   />
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 border-sky-blue/50 focus:border-teal"
-                    disabled={isSubmitting}
-                  />
-                </div>
+
+            <div>
+              <Label>Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  autoComplete="new-password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 pr-10"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
+            </div>
+
             </CardContent>
 
             <CardFooter className="flex flex-col gap-4">
               <Button
                 type="submit"
-                className="w-full bg-teal text-beige hover:bg-teal/90"
+                className="w-full bg-teal text-beige"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -131,16 +147,13 @@ const Login: React.FC = () => {
                     Signing in...
                   </>
                 ) : (
-                  'Sign In'
+                  "Sign In"
                 )}
               </Button>
-              
-              <p className="text-center text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link
-                  to="/signup"
-                  className="font-medium text-teal underline-offset-4 hover:underline"
-                >
+
+              <p className="text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link to="/signup" className="text-teal underline">
                   Sign up
                 </Link>
               </p>
