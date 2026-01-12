@@ -1,11 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, Library } from 'lucide-react';
-import { useBooks } from '@/context/BookContext';
-import PageLayout from '@/components/PageLayout';
-import BookCard from '@/components/BookCard';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import React from "react";
+import { Link } from "react-router-dom";
+import { BookOpen, Library } from "lucide-react";
+import { useBooks } from "../context/BookContext";
+import PageLayout from "../components/PageLayout";
+import BookCard from "../components/BookCard";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
 
 const CurrentlyReading: React.FC = () => {
   const { activeBooks } = useBooks();
@@ -13,8 +13,8 @@ const CurrentlyReading: React.FC = () => {
   return (
     <PageLayout>
       <div className="space-y-8">
-        <div className="animate-fade-in">
-          <h1 className="font-heading text-3xl font-bold md:text-4xl">
+        <div>
+          <h1 className="text-3xl font-bold md:text-4xl">
             Currently Reading
           </h1>
           <p className="mt-1 text-muted-foreground">
@@ -22,7 +22,7 @@ const CurrentlyReading: React.FC = () => {
           </p>
         </div>
 
-        <Card className="border-sky-blue/30">
+        <Card>
           <CardContent className="py-4">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Reading Slots:</span>
@@ -32,8 +32,8 @@ const CurrentlyReading: React.FC = () => {
                     key={slot}
                     className={`h-3 w-8 rounded-full ${
                       slot <= activeBooks.length
-                        ? 'bg-teal'
-                        : 'bg-sky-blue/30'
+                        ? "bg-teal"
+                        : "bg-sky-blue/30"
                     }`}
                   />
                 ))}
@@ -53,7 +53,7 @@ const CurrentlyReading: React.FC = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center py-16 text-center">
-            <BookOpen className="h-10 w-10 text-teal mb-4" />
+            <BookOpen className="mb-4 h-10 w-10 text-teal" />
             <h2 className="text-xl font-semibold">No active books</h2>
             <p className="mt-2 text-muted-foreground">
               Start reading a book from your library.

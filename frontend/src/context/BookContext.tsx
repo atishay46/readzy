@@ -15,7 +15,8 @@ import {
   deleteBook as deleteBookApi,
 } from "../api/books";
 
-// ✅ Book interface matching MongoDB response
+import { useAuth } from "./AuthContext";
+
 export interface Book {
   _id: string;
   title: string;
@@ -35,13 +36,21 @@ interface BookContextType {
 const BookContext = createContext<BookContextType | undefined>(undefined);
 
 export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuth();
+
   const [books, setBooks] = useState<Book[]>([]);
   const [activeBooks, setActiveBooks] = useState<Book[]>([]);
 
   /**
-   * Initial load – fetch all books + active books from backend
+   * Load books ONLY when authenticated
    */
   useEffect(() => {
+    if (!isAuthenticated) {
+      setBooks([]);
+      setActiveBooks([]);
+      return;
+    }
+
     const loadBooks = async () => {
       try {
         const allBooksRes = await getAllBooks();
@@ -55,18 +64,15 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     loadBooks();
-  }, []);
+  }, [isAuthenticated]);
 
   /**
    * Add a new book
-   * POST /books
    */
   const addBook = useCallback(
     async (title: string, drivePreviewUrl: string) => {
       try {
         const response = await addBookApi({ title, drivePreviewUrl });
-
-        // Backend returns created book
         setBooks((prev) => [...prev, response.data]);
       } catch (error) {
         console.error("Failed to add book:", error);
@@ -76,15 +82,12 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 
   /**
-   * Mark book as read
-   * POST /books/:id/read
-   * Backend handles LRU + active book logic
+   * Mark book as read (LRU handled by backend)
    */
   const markAsRead = useCallback(async (bookId: string) => {
     try {
       await markBookAsRead(bookId);
 
-      // Refresh books from backend (source of truth)
       const allBooksRes = await getAllBooks();
       setBooks(allBooksRes.data);
 
@@ -97,15 +100,12 @@ export const BookProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   /**
    * Delete a book
-   * DELETE /books/:id
    */
   const deleteBook = useCallback(async (bookId: string) => {
     try {
       await deleteBookApi(bookId);
-
-      // Remove locally (backend already deleted)
-      setBooks((prev) => prev.filter((book) => book._id !== bookId));
-      setActiveBooks((prev) => prev.filter((book) => book._id !== bookId));
+      setBooks((prev) => prev.filter((b) => b._id !== bookId));
+      setActiveBooks((prev) => prev.filter((b) => b._id !== bookId));
     } catch (error) {
       console.error("Failed to delete book:", error);
     }

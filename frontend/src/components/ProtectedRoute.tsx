@@ -1,23 +1,30 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 /**
- * ProtectedRoute - Guards routes that require authentication
- * 
- * TODO (Backend):
- * Validate JWT using backend middleware
- * Add token refresh logic for expired tokens
+ * ProtectedRoute
+ * ----------------
+ * Guards routes that require authentication.
+ *
+ * Behavior:
+ * - While auth state is loading → show spinner
+ * - If user is not authenticated → redirect to /login
+ * - If authenticated → render protected content
+ *
+ * Notes:
+ * - JWT validation happens on the backend (via middleware)
+ * - Frontend only checks auth state + token presence
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // Show nothing while checking auth status
+  // While checking auth state (on refresh)
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -29,12 +36,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // Redirect to login if not authenticated
+  // Not authenticated → redirect to login
   if (!isAuthenticated) {
-    // Save attempted URL for redirect after login
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location }}
+        replace
+      />
+    );
   }
 
+  // Authenticated → allow access
   return <>{children}</>;
 };
 
