@@ -68,11 +68,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = useCallback(async (email: string, password: string) => {
     try {
       const res = await loginApi({ email, password });
-
-      // 1. Save token
+  
+      // Save token
       localStorage.setItem(TOKEN_KEY, res.token);
-
-      // 2. Fetch logged-in user
+  
+      // Fetch user using token
       const userRes = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
         {
@@ -81,23 +81,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           },
         }
       );
-
+  
       if (!userRes.ok) {
         throw new Error("Failed to fetch user");
       }
-
-      const user: User = await userRes.json();
-
-      // 3. Save user
+  
+      const user = await userRes.json();
+  
       localStorage.setItem(USER_KEY, JSON.stringify(user));
       setUser(user);
-
-      return true;
+  
+      return true; // ✅ SUCCESS
     } catch (error) {
       console.error("Login failed:", error);
-      return false;
+  
+      // IMPORTANT: clear any stale data
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      setUser(null);
+  
+      return false; // ❌ FAILURE
     }
   }, []);
+  
 
   /**
    * Signup user (REAL BACKEND)

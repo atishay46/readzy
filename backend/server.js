@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const PORT = process.env.PORT || 5000;
 
 const connectDB = require("./config/db");
 
@@ -9,7 +10,13 @@ const app = express();
 
 connectDB();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 
 app.get("/health", (req, res) => {
@@ -25,6 +32,7 @@ app.use("/auth", authRoutes);
 
 app.use("/books", authMiddleware, bookRoutes);
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+

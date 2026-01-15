@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
             <span className="text-teal">{user?.name}</span>
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            Ready to continue your reading journey?
+             Pick up where your curiosity left off.
           </p>
         </div>
 
