@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# Readzy
 
-## Project info
+Readzy is a full-stack personal reading management application that allows users to organize their digital book library and manage a limited “currently reading” list using Least Recently Used (LRU) logic.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The application models real-world reading behavior, where users may own many books but can actively read only a few at a time.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Features
 
-**Use Lovable**
+### Authentication
+- User signup and login using JWT-based authentication
+- Secure, user-specific data isolation
+- Protected routes for authenticated users
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Library Management
+- Add books using Google Drive PDF links
+- Store only book metadata (no file hosting)
+- Search books by title
+- Delete books manually
 
-Changes made via Lovable will be committed automatically to this repo.
+### Currently Reading (LRU-Based)
+- Maximum of three active reading slots per user
+- Reading a book marks it as active and updates its last access time
+- When the limit is exceeded, the least recently read book is automatically deactivated
+- Deactivated books remain in the library and can be reactivated at any time
 
-**Use your preferred IDE**
+### Data Persistence
+- MongoDB used for persistent storage
+- User-specific book collections
+- LRU state preserved across server restarts
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tech Stack
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
+### Frontend
+- React.js (Vite)
 - TypeScript
-- React
-- shadcn-ui
 - Tailwind CSS
+- React Router
 
-## How can I deploy this project?
+### Backend
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT authentication
+- Docker
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## How LRU Logic Works
 
-Yes, you can!
+- Each book stores a `lastReadAt` timestamp
+- Active books are limited to three per user
+- When a fourth book is read:
+  - The book with the oldest `lastReadAt` value is deactivated
+  - No data is deleted
+- LRU logic is applied independently for each user
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+-License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is for educational and portfolio purposes.
+
