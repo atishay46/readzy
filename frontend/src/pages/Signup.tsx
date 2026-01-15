@@ -93,17 +93,21 @@ const Signup: React.FC = () => {
             </CardDescription>
           </CardHeader>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} autoComplete="off">
             <CardContent className="space-y-4">
               <div>
                 <Label>Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} />
+                <Input value={name} 
+                      placeholder="Enter your name" 
+                      onChange={(e) => setName(e.target.value)} />
               </div>
 
               <div>
                 <Label>Email</Label>
                 <Input
                   type="email"
+                  autoComplete="new-email"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -113,6 +117,8 @@ const Signup: React.FC = () => {
                 <Label>Password</Label>
                 <Input
                   type="password"
+                  autoComplete="new-password"
+                  placeholder="Enter you password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

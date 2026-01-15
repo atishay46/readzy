@@ -31,44 +31,50 @@ const Login: React.FC = () => {
     (location.state as { from?: { pathname: string } })?.from?.pathname ||
     "/dashboard";
 
-  // ✅ REDIRECT WHEN AUTH STATE UPDATES
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, from, navigate]);
+  
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!email || !password) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await login(email, password);
-
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
-    } catch {
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+    
+      if (!email || !password) {
+        toast({
+          title: "Missing fields",
+          description: "Please fill in all fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+    
+      setIsSubmitting(true);
+    
+      try {
+        const success = await login(email, password);
+    
+        if (success) {
+          toast({
+            title: "Welcome back!",
+            description: "You have successfully logged in.",
+          });
+    
+          navigate(from, { replace: true });
+        } else {
+          toast({
+            title: "Login failed",
+            description: "Invalid email or password.",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        toast({
+          title: "Login failed",
+          description: "Something went wrong.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+    
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-navy p-4">
@@ -78,7 +84,7 @@ const Login: React.FC = () => {
             <BookOpen className="h-8 w-8 text-beige" />
           </div>
           <h1 className="text-3xl font-bold text-beige">Readzy</h1>
-          <p className="mt-2 text-sky-blue">Your personal reading companion</p>
+          <p className="mt-2 text-sky-blue">Designed for how you actually read.</p>
         </div>
 
         <Card className="border-sky-blue/20 bg-card">
@@ -98,13 +104,16 @@ const Login: React.FC = () => {
                   <Input
                     type="email"
                     autoComplete="new-email"
-                    placeholder="Enter your Email address"
+                    placeholder="Enter your email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
                   />
                 </div>
               </div>
+
+
+
 
             <div>
               <Label>Password</Label>
@@ -115,6 +124,7 @@ const Login: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   autoComplete="new-password"
+                  placeholder="Enter your password"
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10"
                 />

@@ -3,7 +3,7 @@ version: "3.9"
 services:
   mongo:
     image: mongo:6
-    container_name: smart-reading-mongo
+    container_name: readzy-mongo
     ports:
       - "27017:27017"
     volumes:
@@ -11,7 +11,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: smart-reading-backend
+    container_name: readzy-backend
     ports:
       - "5000:5000"
     env_file:
@@ -20,7 +20,7 @@ services:
       - mongo
     environment:
       # IMPORTANT: use service name 'mongo'
-      MONGO_URI: mongodb://mongo:27017/smart-reading-shelf
+      MONGO_URI: mongodb://mongo:27017/readzy
 
 volumes:
   mongo_data:
